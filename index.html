@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Prayer Timings</title>
+</head>
+<body>
+  <h1>Prayer Timings</h1>
+  <p>Latitude: <span id="latitude"></span></p>
+  <p>Longitude: <span id="longitude"></span></p>
+  <p>Fajr: <span id="fajr"></span></p>
+  <p>Dhuhr: <span id="dhuhr"></span></p>
+  <p>Asr: <span id="asr"></span></p>
+  <p>Maghrib: <span id="maghrib"></span></p>
+  <p>Isha: <span id="isha"></span></p>
+
+  <script>
+    // Check if we already have permission to access the user's location
+    var permission = localStorage.getItem("location_permission");
+    if (permission === null) {
+      // Ask for permission to access the user's location
+      navigator.permissions.query({name:'geolocation'}).then(function(result) {
+        if (result.state === 'granted') {
+          console.log('Location permission granted.');
+          localStorage.setItem("location_permission", "granted");
+          fetchTimings();
+        } else if (result.state === 'prompt') {
+          console.log('Asking for location permission...');
+          navigator.geolocation.getCurrentPosition(function() {
+            console.log('Location permission granted.');
+            localStorage.setItem("location_permission", "granted");
+            fetchTimings();
+          }, function() {
+            console.log('Location permission denied.');
+            localStorage.setItem("location_permission", "denied");
+          });
+        } else if (result.state === 'denied') {
+          console.log('Location permission denied.');
+          localStorage.setItem("location_permission", "denied");
+        }
+      });
+    } else if (permission === "granted") {
+      fetchTimings();
+    }
+
+    function fetchTimings() {
+      // Get the user's location
+      navigator.geolocation.getCurrentPosition(function(position) {
+        // Get the latitude and longitude
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
+
+        // Construct the URL to fetch prayer timings
+        var url = "https://api.aladhan.com/v1/timings?latitude=" + latitude + "&longitude=" + longitude;
+
+        // Fetch the prayer timings from the API
+        fetch(url)
+          .then(response => response.json())
+          .then(data => {
+            // Update the HTML with the prayer timings
+            document.getElementById("latitude").innerHTML = data.data.latitude;
+            document.getElementById("longitude").innerHTML = data.data.longitude;
+            document.getElementById("fajr").innerHTML = data.data.timings.Fajr;
+            document.getElementById("dhuhr").innerHTML = data.data.timings.Dhuhr;
+            document.getElementById("asr").innerHTML = data.data.timings.Asr;
+            document.getElementById("maghrib").innerHTML = data.data.timings.Maghrib;
+            document.getElementById("isha").innerHTML = data.data.timings.Isha;
+          })
+          .catch(error => {
+            console.log("Error fetching prayer timings:", error);
+            setTimeout(() => fetchTimings(), 1000);
+          });
+      }, function(error) {
+        console.log("Error getting user's location:", error);
+        setTimeout(() => fetchTimings(), 1000);
+      });
+    }
+  </script>
+</body>
+</html>
