@@ -5,13 +5,12 @@
 </head>
 <body>
   <h1>Prayer Timings</h1>
-  <p>Latitude: <span id="latitude"></span></p>
-  <p>Longitude: <span id="longitude"></span></p>
-  <p>Fajr: <span id="fajr"></span></p>
-  <p>Dhuhr: <span id="dhuhr"></span></p>
-  <p>Asr: <span id="asr"></span></p>
-  <p>Maghrib: <span id="maghrib"></span></p>
-  <p>Isha: <span id="isha"></span></p>
+  <div id="loading">Loading...</div>
+  <p id="fajr"></p>
+  <p id="dhuhr"></p>
+  <p id="asr"></p>
+  <p id="maghrib"></p>
+  <p id="isha"></p>
 
   <script>
     // Check if we already have permission to access the user's location
@@ -43,6 +42,9 @@
     }
 
     function fetchTimings() {
+      // Show a loading message
+      document.getElementById("loading").innerHTML = "Loading...";
+
       // Get the user's location
       navigator.geolocation.getCurrentPosition(function(position) {
         // Get the latitude and longitude
@@ -57,13 +59,14 @@
           .then(response => response.json())
           .then(data => {
             // Update the HTML with the prayer timings
-            document.getElementById("latitude").innerHTML = data.data.latitude;
-            document.getElementById("longitude").innerHTML = data.data.longitude;
-            document.getElementById("fajr").innerHTML = data.data.timings.Fajr;
-            document.getElementById("dhuhr").innerHTML = data.data.timings.Dhuhr;
-            document.getElementById("asr").innerHTML = data.data.timings.Asr;
-            document.getElementById("maghrib").innerHTML = data.data.timings.Maghrib;
-            document.getElementById("isha").innerHTML = data.data.timings.Isha;
+            document.getElementById("fajr").innerHTML = "Fajr: " + data.data.timings.Fajr;
+            document.getElementById("dhuhr").innerHTML = "Dhuhr: " + data.data.timings.Dhuhr;
+            document.getElementById("asr").innerHTML = "Asr: " + data.data.timings.Asr;
+            document.getElementById("maghrib").innerHTML = "Maghrib: " + data.data.timings.Maghrib;
+            document.getElementById("isha").innerHTML = "Isha: " + data.data.timings.Isha;
+
+            // Hide the loading message
+            document.getElementById("loading").style.display = "none";
           })
           .catch(error => {
             console.log("Error fetching prayer timings:", error);
