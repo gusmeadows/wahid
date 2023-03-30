@@ -6,6 +6,7 @@
 <body>
   <h1>Prayer Timings</h1>
   <div id="loading">Loading...</div>
+  <button onclick="resetLocation()">Reset Location</button>
   <p id="fajr"></p>
   <p id="dhuhr"></p>
   <p id="asr"></p>
@@ -51,6 +52,10 @@
         var latitude = position.coords.latitude;
         var longitude = position.coords.longitude;
 
+        // Store the latitude and longitude in local storage
+        localStorage.setItem("latitude", latitude);
+        localStorage.setItem("longitude", longitude);
+
         // Construct the URL to fetch prayer timings
         var url = "https://api.aladhan.com/v1/timings?latitude=" + latitude + "&longitude=" + longitude;
 
@@ -77,6 +82,19 @@
         setTimeout(() => fetchTimings(), 1000);
       });
     }
+
+    function resetLocation() {
+      // Remove the stored latitude and longitude
+      localStorage.removeItem("latitude");
+      localStorage
+	  .removeItem("longitude");
+
+  // Remove the stored location permission
+  localStorage.removeItem("location_permission");
+
+  // Refresh the page
+  location.reload();
+}
   </script>
 </body>
 </html>
